@@ -1,0 +1,28 @@
+<style>
+	body{
+		display: block;
+		margin: 0;
+	}
+</style>
+
+<body>
+	<div id="speed" style="margin: 0 auto; width: 50%; font-size: 100px; text-align: center;"></div>
+</body>
+
+<script>
+	var carID = -1;
+	var webSocket = new WebSocket("ws://192.168.0.22:5678", "protocolOne");
+	webSocket.onopen = function(event){
+		console.log("connection established");
+		webSocket.send(JSON.stringify({"id": "basic", "fields": ["Speed", "CarOrdinal"]}));
+	};
+	webSocket.onmessage = function (event) {
+		var data = JSON.parse(event.data);	
+
+		var speed = Math.floor(data.Speed * 2.23694);
+		document.getElementById("speed").innerHTML = speed;
+
+		carID = data.CarOrdinal;
+		webSocket.send(JSON.stringify({"id": "basic", "fields": ["Speed", "CarOrdinal"]}));	
+	}
+</script>

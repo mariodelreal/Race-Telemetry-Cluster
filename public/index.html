@@ -1,0 +1,81 @@
+<style>
+	body{
+		display: block;
+		margin: 0;
+	}
+</style>
+
+<body>
+	<div id="tachometer"></div>
+	<div id="gear" style="margin: 0 auto; width: 50%; font-size: 120px; text-align: center;"></div>
+	<div id="speed" style="margin: 0 auto; width: 50%; font-size: 100px; text-align: center;"></div>
+</body>
+
+<script>
+	var carID = -1;
+	var webSocket = new WebSocket("ws://192.168.0.22:5678", "protocolOne");
+	webSocket.onopen = function(event){
+		console.log("connection established");
+		webSocket.send(JSON.stringify({"id": "default", "fields": ["Gear", "Speed", "EngineIdleRpm", "EngineMaxRpm", "CurrentEngineRpm", "CarOrdinal"]}));
+	};
+	webSocket.onmessage = function (event) {
+		var data = JSON.parse(event.data);	
+
+		var idleRPM = Math.ceil(data.EngineIdleRpm);
+		var maxRPM = Math.ceil(data.EngineMaxRpm);
+		var currentRPM = Math.ceil(data.CurrentEngineRpm);
+
+		var intervals = Math.floor(maxRPM / 1000);
+		var currentRPMInterval = Math.floor(currentRPM / 1000);
+
+		if (maxRPM % 1000 === 0){
+			intervals -= 1;
+		}
+
+		var tachometer = document.getElementById("tachometer");
+		if (carID !== data.CarOrdinal){
+			tachometer.innerHTML = "";
+		}
+		if (tachometer.children.length === 0){
+			for (var i = 0; i < intervals; i++){
+				var newDiv = document.createElement("div");
+
+				var squareLength = "calc(100% / " + intervals + " - 2px)";
+				newDiv.style.width = squareLength;
+				//newDiv.style.height = newDiv.style.width;
+				newDiv.style.border = "1px solid black";
+				newDiv.style.display = "inline-block";
+				newDiv.id = "tach-" + i;
+
+				tachometer.appendChild(newDiv);
+				newDiv.style.height = newDiv.clientWidth;
+			}
+		}
+
+		var greenInterval = Math.floor(255 / intervals);
+		for (var i = 0; i < intervals; i++){
+			if (currentRPMInterval === intervals){
+				document.getElementById("tach-" + i).style.backgroundColor = "rgb(200,0,0)";
+			}
+			else{
+				if (i <= currentRPMInterval - 1){
+					var green = 255 - (greenInterval * i);
+
+					document.getElementById("tach-" + i).style.backgroundColor = "rgb(200," + green + ",0)";
+				}
+				else{
+					document.getElementById("tach-" + i).style.backgroundColor = "";
+				}
+			}
+		
+		}
+
+		document.getElementById("gear").innerHTML = data.Gear;
+
+		var speed = Math.floor(data.Speed * 2.23694);
+		document.getElementById("speed").innerHTML = speed;
+
+		carID = data.CarOrdinal;
+		webSocket.send(JSON.stringify({"id": "default", "fields": ["Gear", "Speed", "EngineIdleRpm", "EngineMaxRpm", "CurrentEngineRpm", "CarOrdinal"]}));	
+	}
+</script>
