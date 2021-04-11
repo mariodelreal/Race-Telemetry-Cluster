@@ -1,10 +1,13 @@
 const TelemetryHandler = require('./TelemetryHandler.js');
 
-// const GAME = "ForzaMotorsport7";
-const GAME = "ForzaHorizon4";
+var Game = process.env.npm_config_game;
+var UDPPort = process.env["npm_config_udpPort"];
+var WebSocketPort = process.env["npm_config_wsPort"];
+var HTTPPort = process.env["npm_config_httpPort"];
 
-const UDPPort = 6789;
-const WebSocketPort = 5678;
-const HTTPPort = 8080;
-
-TelemetryHandler.startTelemetryCapture(GAME, UDPPort, WebSocketPort, HTTPPort);
+if (Game){
+    TelemetryHandler.startTelemetryCapture(Game, UDPPort, WebSocketPort, HTTPPort);
+}
+else{
+    console.log("--game argument must be provided. Valid options are ForzaHorizion4 or ForzaMotorsport7");
+}

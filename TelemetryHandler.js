@@ -3,9 +3,9 @@ const WebSocketServer = require('./WebSocketServer.js');
 const HTTPServer = require('./HTTPServer.js');
 const GameData = require("./GameData.js");
 
-module.exports.startTelemetryCapture = function(game, UDPPort = 6789, WebSocketPort = 5678, HTTPPort = 8080){
+module.exports.startTelemetryCapture = function(game, UDPPort, WebSocketPort, HTTPPort){
     var gameData = GameData.getGameData(game);
-    UDPServer.startUDPServer(gameData, UDPPort);
-    WebSocketServer.startWebSocketServer(gameData, WebSocketPort);
-    HTTPServer.startHTTPServer(HTTPPort);
+    UDPServer.startUDPServer(gameData, UDPPort || 6789);
+    WebSocketServer.startWebSocketServer(gameData, WebSocketPort || 5678);
+    HTTPServer.startHTTPServer(HTTPPort || 8080);
 }
