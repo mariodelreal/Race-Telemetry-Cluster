@@ -24,7 +24,7 @@ npm start --game=ForzaMotorsport7
 
 If one or more of the network ports need to be modified, default values can be replaced
 ```bash
-npm start --game=ForzaHorizon4 --udpPort 1111 --wsPort=2222 --httpPort=3333
+npm start --game=ForzaHorizon4 --udpPort=1111 --wsPort=2222 --httpPort=3333
 ```
 
 NOTE: There are sample pages under the /public folder. These use a hard connection to the host machine's ip address. This must be updated to work on another machine. If the --wsPort is overridden. The client that communicates through the web socket port must also be updated to talk to the right port. The example pages under /public use the default port 5678.
