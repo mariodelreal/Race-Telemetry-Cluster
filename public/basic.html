@@ -11,7 +11,7 @@
 
 <script>
 	var carID = -1;
-	var webSocket = new WebSocket("ws://192.168.0.22:5678", "protocolOne");
+	var webSocket = new WebSocket("ws://192.168.1.251:5678", "protocolOne");
 	webSocket.onopen = function(event){
 		console.log("connection established");
 		webSocket.send(JSON.stringify({"id": "basic", "fields": ["Speed", "CarOrdinal"]}));

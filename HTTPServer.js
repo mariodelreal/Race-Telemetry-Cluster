@@ -1,35 +1,36 @@
-const fs = require('fs');
-const HTTPServer = require('http');
-const RoutingMap = require('./TelemetryRoutingMap.js');
-
-module.exports.startHTTPServer = function (port){
-    startHTTPServer(port);
-}
-
-function startHTTPServer(port){
-    HTTPServer.createServer(function(req, res){
-        var url = req.url;
-        if (url in RoutingMap.RoutingMap){
-            fetchStaticHTML(RoutingMap.RoutingMap[url], res);
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = __importDefault(require("fs"));
+const http_1 = __importDefault(require("http"));
+const TelemetryRoutingMap_1 = __importDefault(require("./TelemetryRoutingMap"));
+function fetchStaticHTML(path, res) {
+    fs_1.default.readFile(path, (error, pgResp) => {
+        if (error) {
+            res.writeHead(404);
+            res.write('Contents you are looking for not found');
         }
-        else{
-            res.write("Unknown page hit");
-            res.end();
+        else {
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.write(pgResp);
         }
-    }).listen(port, function(){
-        console.log("HTTP server listening on port " + port);
+        res.end();
     });
 }
-
-function fetchStaticHTML(path, res, cb){
-	(cb && typeof cb === "function") ? fs.readFile(path, cb) : fs.readFile(path, function(error, pgResp){
-		if (error){
-			res.writeHead(404);
-			res.write("Contents you are looking for not found");
-		} else{
-			res.writeHead(200, {"Content-Type": "text/html"});
-			res.write(pgResp);
-		}
-		res.end();
-	});
+function startHTTPServer(port) {
+    http_1.default.createServer((req, res) => {
+        const { url } = req;
+        if (url in TelemetryRoutingMap_1.default) {
+            fetchStaticHTML(TelemetryRoutingMap_1.default[url], res);
+        }
+        else {
+            res.write('Unknown page hit');
+            res.end();
+        }
+    }).listen(port, () => {
+        console.log(`HTTP server listening on port ${port}`);
+    });
 }
+exports.default = startHTTPServer;
